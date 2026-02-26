@@ -1,3 +1,7 @@
-my_list = [1, 2, 3, 4, 5, "k", "name", 2.6]
+numbers = [1, 2, 3, 4, 5]
+names = ["Kousalya", "Anu", "Ravi"]
+mixed = [1, "hello", 3.5, True]
 
-print(my_list[6])
+print(numbers)
+print(names)
+print(mixed)
