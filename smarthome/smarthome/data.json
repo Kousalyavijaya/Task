@@ -1,0 +1,22 @@
+[
+    {
+        "id": 1,
+        "name": "Light",
+        "status": "ON"
+    },
+    {
+        "id": 2,
+        "name": "Fan",
+        "status": "OFF"
+    },
+    {
+        "id": 3,
+        "name": "AC",
+        "status": "ON"
+    },
+    {
+        "id": 4,
+        "name": "Door Lock",
+        "status": "LOCKED"
+    }
+]
