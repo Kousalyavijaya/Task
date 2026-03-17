@@ -1,0 +1,7 @@
+Django
+djangorestframework
+mysqlclient
+firebase-admin
+python-dotenv
+requests
+pytz
