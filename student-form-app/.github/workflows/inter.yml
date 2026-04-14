@@ -1,0 +1,75 @@
+name: Advanced Fullstack CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      # Backend
+      - run: |
+          cd backend
+          npm install
+          npm run lint
+          npm test
+
+      # Frontend
+      - run: |
+          cd frontend
+          npm install
+          npm run build
+
+  docker:
+    needs: ci
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build Backend Image
+        run: docker build -t backend-app ./backend
+
+      - name: Build Frontend Image
+        run: docker build -t frontend-app ./frontend
+
+      - name: Login DockerHub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Push Images
+        run: |
+          docker tag backend-app yourname/backend-app:latest
+          docker tag frontend-app yourname/frontend-app:latest
+          docker push yourname/backend-app:latest
+          docker push yourname/frontend-app:latest
+
+  deploy:
+    needs: docker
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            docker pull yourname/backend-app:latest
+            docker pull yourname/frontend-app:latest
+
+            docker stop backend || true
+            docker rm backend || true
+            docker run -d -p 5000:5000 --name backend yourname/backend-app:latest
+
+            docker stop frontend || true
+            docker rm frontend || true
+            docker run -d -p 80:3000 --name frontend yourname/frontend-app:latest
